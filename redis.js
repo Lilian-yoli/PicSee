@@ -6,14 +6,35 @@ redisClient.on("ready", function () {
 });
 
 redisClient.on("error", function (error) {
-    console.error(error);
-  });
+  console.error(error);
+});
 
-  const get = promisify(redisClient.get).bind(redisClient);
-  const set = promisify(redisClient.set).bind(redisClient);
+function inrcCache (key) {
+  return new Promise((resv, rej) => {
+    redisClient.incr(key, (err, reply) => {
+      resv(reply);
+    });
+  });
+}
+
+async function checkLimitation (user) {
+  let res = "";
+  try {
+    res = await inrcCache(user);
+  } catch (err) {
+    console.log("isOverLimit: could not increment key");
+    throw err;
+  }
+  console.log(`${user} has value: ${res}`);
+  const overLimit = -1;
+  if (res > 5) {
+    return overLimit;
+  }
+  redisClient.expire(user, 600);
+
+  return res;
+}
 
 module.exports = {
-    redisClient,
-    get,
-    set
+  checkLimitation
 };
