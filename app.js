@@ -1,23 +1,20 @@
 const express = require("express");
 const app = express();
 const { checkLimitation } = require("./redis");
+const { getIp, sendStatus } = require("./util");
 
 app.use(express.json());
 
 app.get("/", async (req, res) => {
-  console.log(req.query);
   const { user } = req.query;
   if (!user) {
-    res.status(401).send({ error: "unauthorized" });
+    const ip = getIp();
+    const rateLimiter = await checkLimitation(ip);
+    sendStatus(rateLimiter, res);
   } else if (user !== "admin") {
     // setup rate limiter
     const rateLimiter = await checkLimitation(user);
-
-    if (rateLimiter < 0) {
-      res.status(429).send({ error: "over limitation" });
-    } else {
-      res.status(200).send({ counter: rateLimiter });
-    }
+    sendStatus(rateLimiter, res);
   } else {
     res.status(200).send({ counter: "unlimited" });
   }
