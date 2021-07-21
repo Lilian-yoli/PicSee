@@ -5,22 +5,23 @@ const ip = require("ip");
 
 app.use(express.json());
 
-app.get("/", async (req, res) => {
+app.get("/:id", async (req, res) => {
   const { user } = req.query;
+  const { id } = req.params;
   if (!user) {
     const rateLimiter = await checkLimitation(ip.address(), 5);
     sendStatus(rateLimiter, res);
   } else if (user !== "admin") {
     // setup rate limiter
     const limit = await getClientLimit(user);
-    const rateLimiter = await checkLimitation(user, limit);
+    const rateLimiter = await checkLimitation(user + id, limit);
     sendStatus(rateLimiter, res);
   } else {
     res.status(200).send({ counter: "unlimited" });
   }
 });
 
-app.post("/limit", (req, res) => {
+app.post("/clientlimit", (req, res) => {
   const { user, limit } = req.body;
   const clientLimit = {};
   clientLimit[user] = limit;

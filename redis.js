@@ -1,3 +1,4 @@
+/* eslint-disable promise/param-names */
 const redis = require("redis");
 const redisClient = redis.createClient({ host: "localhost", port: 6379 });
 
@@ -11,7 +12,7 @@ redisClient.on("error", function (error) {
 
 function inrcCache (key) {
   return new Promise((resv, rej) => {
-    redisClient.incr(key, (err, reply) => {
+    redisClient.incr(key, (_err, reply) => {
       resv(reply);
     });
   });
@@ -68,15 +69,11 @@ const saveLimitList = (userLimit) => {
   }
 };
 
-console.log(saveLimitList({ m: 8 }));
-
 const getClientLimit = async (user) => {
   const key = await getLimit(user);
   console.log(key);
   return key;
 };
-
-// console.log("getClientLimit", getClientLimit("abc"));
 
 module.exports = {
   checkLimitation,
