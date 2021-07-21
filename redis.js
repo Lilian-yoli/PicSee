@@ -17,8 +17,21 @@ function inrcCache (key) {
   });
 }
 
-async function checkLimitation (user) {
+function getLimit (key) {
+  return new Promise((resv, rej) => {
+    redisClient.hget("clientLimitList", key, (err, val) => {
+      if (err) {
+        rej(err);
+      } else {
+        resv(val);
+      }
+    });
+  });
+}
+
+const checkLimitation = async (user, limit) => {
   let res = "";
+  console.log("limit", limit);
   try {
     res = await inrcCache(user);
   } catch (err) {
@@ -27,14 +40,46 @@ async function checkLimitation (user) {
   }
   console.log(`${user} has value: ${res}`);
   const overLimit = -1;
-  if (res > 5) {
+  if (res > limit) {
     return overLimit;
   }
   redisClient.expire(user, 600);
 
   return res;
-}
+};
+
+const saveLimitList = (userLimit) => {
+  const key = redisClient.hgetall("clientLimitList", (err, val) => {
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(val);
+    }
+  });
+  if (!key) {
+    redisClient.hmset("clientLimitList", userLimit, (err, reply) => {
+      if (err) {
+        console.log(err);
+      }
+      console.log(reply);
+    });
+  } else {
+    redisClient.hset("clientLimitList", userLimit);
+  }
+};
+
+console.log(saveLimitList({ m: 8 }));
+
+const getClientLimit = async (user) => {
+  const key = await getLimit(user);
+  console.log(key);
+  return key;
+};
+
+// console.log("getClientLimit", getClientLimit("abc"));
 
 module.exports = {
-  checkLimitation
+  checkLimitation,
+  saveLimitList,
+  getClientLimit
 };
