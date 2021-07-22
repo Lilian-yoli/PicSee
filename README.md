@@ -1,4 +1,6 @@
 # Rate Limiter
+    
+The latest version is in branch develop.
   
 First, with query on url for identification, users get the response of the times they hit the api and error message when over the limitation.
 ![with_query](https://github.com/Lilian-yoli/ratelimiter/blob/main/demo/rate_limit_user.gif)
