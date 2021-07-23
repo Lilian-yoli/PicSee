@@ -2,7 +2,7 @@
     
 The latest version is in branch develop.
   
-First, with query on url for identification, users get the response of the times they hit the api and error message when over the limitation.</br>
+First, with query on url for identification, users get the response of the times they hit the api and the usage available time when over the limitation.</br>
 ![with_query](https://j.gifs.com/qQ7vPR.gif)
   
 Without query of user, do the rate limitation by ip address instead. </br>
