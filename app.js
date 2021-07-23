@@ -37,27 +37,27 @@ const retelimiter = () => {
   return async function (req, res, next) {
     try {
       const { user } = req.query;
-      const { id } = req.params;
       if (!user) {
         const rateLimit = await checkLimitation(ip.address(), 5);
         if (rateLimit.status == 429) {
-          return res.status(rateLimit.status).send(rateLimit.message);
+          return res.status(rateLimit.status).send({ message: rateLimit.msg });
         } else {
-          req.rate = rateLimit.message;
+          console.log("rateLimit", rateLimit);
+          req.rate = { message: rateLimit.msg };
           next();
         }
       } else if (user !== "admin") {
         // setup rate limiter
         const limit = await getClientLimit(user);
-        const rateLimit = await checkLimitation(user + id, limit);
+        const rateLimit = await checkLimitation(user, limit);
         if (rateLimit.status == 429) {
-          return res.status(rateLimit.status).send(rateLimit.message);
+          return res.status(rateLimit.status).send({ message: rateLimit.msg });
         } else {
-          req.rate = rateLimit.message;
+          req.rate = { message: rateLimit.msg };
           next();
         }
       } else {
-        req.rate = "unlimited";
+        req.rate = { message: "unlimited" };
         next();
       }
     } catch (err) {
@@ -68,8 +68,7 @@ const retelimiter = () => {
 };
 
 app.get("/test", retelimiter(), (req, res) => {
-  console.log("test", req.counter);
-  res.sendStatus(200).send(req.counter);
+  res.status(200).send(req.rate);
 });
 
 app.listen("3000", () => {
