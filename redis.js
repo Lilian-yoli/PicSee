@@ -43,9 +43,6 @@ function getLimit (key) {
 
 const checkLimitation = async (user, limit) => {
   let res = "";
-  console.log("limit", limit);
-  const checkKey = await get(user);
-
   try {
     res = await inrcCache(user);
   } catch (err) {
@@ -57,12 +54,11 @@ const checkLimitation = async (user, limit) => {
     redisClient.expire(user, 600);
   }
   const ttl = await timeToLive(user);
-  console.log("ttl", ttl);
   const time = timeCount(ttl);
   if (res > limit) {
-    return { status: 429, message: `over litmitation, usage available at ${time}` };
+    return { status: 429, msg: `over litmitation, usage available at ${time}` };
   }
-  return { status: 200, message: `hit ${res} times in 10 mins` };
+  return { status: 200, msg: `hit ${res} times in 10 mins` };
 };
 
 const saveLimitList = (userLimit) => {
@@ -89,7 +85,6 @@ const timeCount = (ttl) => {
   const now = new Date();
   let mins = now.getMinutes() + Math.floor(ttl / 60);
   let hours = now.getHours();
-  console.log("timeCount", mins, hours);
   if (mins >= 60) {
     mins = mins % 60;
     hours += 1;

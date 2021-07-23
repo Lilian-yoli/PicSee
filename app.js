@@ -12,12 +12,12 @@ app.get("/", async (req, res) => {
   // 1. if user does not existed
   if (!user) {
     const rateLimiter = await checkLimitation(ip.address(), 5);
-    return res.status(rateLimiter.status).send(rateLimiter.message);
+    return res.status(rateLimiter.status).send({ message: rateLimiter.msg });
   // 2. if user existed but not admin
   } else if (user !== "admin") {
     const limit = await getClientLimit(user);
     const rateLimiter = await checkLimitation(user, limit);
-    return res.status(rateLimiter.status).send(rateLimiter.message);
+    return res.status(rateLimiter.status).send({ message: rateLimiter.msg });
   // 3. if user is admin
   } else {
     res.status(200).send({ message: "unlimited" });
