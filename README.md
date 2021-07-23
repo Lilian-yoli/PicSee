@@ -9,4 +9,4 @@ Without query of user, do the rate limitation by ip address instead. </br>
 ![ip address](https://j.gifs.com/z6vG27.gif)
   
 With the user query of admin, users can use api without limitation.
-![with_query](https://github.com/Lilian-yoli/ratelimiter/blob/main/demo/admin.gif)
+![with_query](https://j.gifs.com/K81nWz.gif)
